@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>PicoEncoder OSC Service</title>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="./css/chota.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <h3>Pico Serial Input</h3>
+        <div id="ports"></div>
+        <button id="serial-button" type="button" class="button primary">Connect</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <h3>OSC Output</h3>
+        <form>
+          <div class="container">
+            <div class="row">
+              <div class="col">
+                <label for="osc_server">Server</label>
+                <input id="osc_server" type="text" value="localhost" />
+              </div>
+              <div class="col">
+                <label for="osc_port">Port</label>
+                <input id="osc_port" type="text" value="8000" />
+              </div>
+              <div class="col">
+                <button id="osc-button" type="button" class="button primary" style="margin-top: 24px;">Update</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <details>
+          <summary>Debug Console</summary>
+          <p>
+          <pre id="console" style="max-height: 200px; font-size: 0.8em;"></pre>
+          </p>
+        </details>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div>
+  <script src="./renderer.js"></script>
+  <script src="./js/osc.js"></script>
+  <script src="./js/serial.js"></script>
+
+  <style>
+    body.dark {
+      --bg-color: #000;
+      --bg-secondary-color: #131316;
+      --font-color: #f5f5f5;
+      --color-grey: #ccc;
+      --color-darkGrey: #777;
+    }
+  </style>
+  <script>
+    if (window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.body.classList.add('dark');
+    }
+  </script>
+</body>
+
+</html>
