@@ -7,8 +7,8 @@ if (require("electron-squirrel-startup")) {
 }
 
 const osc = new OSC({ plugin: new OSC.DatagramPlugin() })
-sendOSC = (object, {host, port, message}) => {
-  osc.send(new OSC.Message(message), { host: host, port: port });
+sendOSC = (object, {host, port, address, value}) => {
+  osc.send(new OSC.Message(address, value), { host: host, port: port });
   return true;
 };
 

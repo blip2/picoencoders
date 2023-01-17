@@ -2,6 +2,13 @@ const BREAK = "\r\n";
 let connected = false;
 const button = document.getElementById("serial-button");
 
+MAPPING = {
+  "encoder1-inc": "/eos/wheel/pan",
+  "encoder1-dec": "/eos/wheel/pan",
+  "encoder2-inc": "/eos/wheel/tilt",
+  "encoder2-dec": "/eos/wheel/tilt",
+};
+
 function logger(type, message) {
   const con = document.getElementById("console");
   con.insertAdjacentHTML(
@@ -43,7 +50,16 @@ async function readFromSerial(port) {
           let data = buffer.substring(0, start);
           buffer = buffer.substring(start + 2);
           logger("READ", data);
-          sendOSCMessage(String(data));
+          if (data in MAPPING) {
+            if (data.includes("encoder")) {
+              sendOSCMessage(
+                String(MAPPING[data]),
+                data.includes("inc") ? '1.0' : '-1.0'
+              );
+            } else {
+              sendOSCMessage(String(MAPPING[data]));
+            }
+          }
         }
       }
     } catch (error) {

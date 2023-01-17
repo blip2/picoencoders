@@ -15,9 +15,9 @@ async function valuesChanged() {
   oscButton.classList.add("primary");
 }
 
-function sendOSCMessage(message) {
-    if (window.osc.send(host, port, message)) {
-      logger("OSC", `Sent '${message}' to ${host}:${port} `);
+function sendOSCMessage(address, value='') {
+    if (window.osc.send(host, port, address, value)) {
+      logger("OSC", `Sent '${address}' to ${host}:${port} `);
     }
 }
 
