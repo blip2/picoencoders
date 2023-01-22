@@ -1,7 +1,9 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
-contextBridge.exposeInMainWorld("osc", {
+contextBridge.exposeInMainWorld("app", {
   updateHost: (host, port) => ipcRenderer.invoke("updateHost", { host, port }),
+  setOnTop: (bool) => ipcRenderer.invoke("setOnTop", bool),
+  userInput: (data) => ipcRenderer.invoke("userInput", data),
 });
 
 ipcRenderer.on("log-message", function (evt, message) {
@@ -16,8 +18,16 @@ ipcRenderer.on("serial-state", function (evt, message) {
     button.classList.remove("error");
     button.classList.add("primary");
   } else {
-    button.innerHTML = "Not Connected to Pico";
+    button.innerHTML = "Disconnected from Pico";
     button.classList.add("error");
     button.classList.remove("primary");
   }
+});
+
+ipcRenderer.on("encoder-mode", function (evt, message) {
+  document.getElementById("mode").innerHTML = message;
+});
+
+ipcRenderer.on("encoder-speed", function (evt, message) {
+  document.getElementById("speed").innerHTML = message;
 });

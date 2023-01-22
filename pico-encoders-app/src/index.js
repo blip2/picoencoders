@@ -11,8 +11,10 @@ if (require("electron-squirrel-startup")) {
 const createWindow = async () => {
   const mainWindow = new BrowserWindow({
     autoHideMenuBar: true,
-    width: 700,
-    height: 350,
+    width: 750,
+    height: 220,
+    minWidth: 750,
+    minHeight: 220,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
@@ -49,6 +51,8 @@ const createWindow = async () => {
     }
   );
 
+  mainWindow.setAlwaysOnTop(false);
+
   // mainWindow.webContents.openDevTools();
 
   mainWindow.loadFile(path.join(__dirname, "index.html"));
@@ -56,9 +60,20 @@ const createWindow = async () => {
   osc = new OSCService(mainWindow);
   serial = new SerialService(mainWindow, osc);
 
+  ipcMain.handle("userInput", (event, args) => {
+    serial.mapMessage(args);
+  });
+
   ipcMain.handle("updateHost", (event, args) => {
     osc.updateHost(args);
   });
+
+  ipcMain.handle("setOnTop", (event, bool) => {
+    mainWindow.setAlwaysOnTop(bool);
+  });
+
+  serial.modeChanged()
+  serial.speedChanged()
 };
 
 app.on("window-all-closed", () => {

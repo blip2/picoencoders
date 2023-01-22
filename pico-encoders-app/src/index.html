@@ -5,16 +5,37 @@
   <title>PicoEncoder OSC Service</title>
   <meta charset="utf-8" />
   <link rel="stylesheet" href="./css/chota.min.css">
+  <link rel="stylesheet" href="./css/custom.css">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body>
   <div class="container">
     <div class="row">
+      <div class="col-4">
+        <h3>Pico Encoder<h3>
+      </div>
+      <div class="col" style="margin-top: 15px;">
+        <div class="pull-right">
+          <p class="muted">Stay on top <input type="checkbox" id="onTop"></p>
+        </div>
+      </div>
+      <div class="col-5" style="margin-top: 12px;">
+        <button id="serial-button" type="button" class="button error pull-right">Disconnected from Pico</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-8">
+        <p class="muted">Mode (left/right encoder wheels)</p>
+        <div id="push-left" class="buttons">&#xab;</div>
+        <div id="mode" class="mode-block"></div>
+        <div id="push-right" class="buttons">&#xbb;</div>
+      </div>
       <div class="col">
-        <h3>Pico Encoder
-          <button id="serial-button" type="button" class="button error pull-right">Not Connected to Pico</button>
-        </h3>
+        <p class="muted">Speed</p>
+        <div id="push-down" class="buttons">-</div>
+        <div id="speed" class="speed-block"></div>
+        <div id="push-up" class="buttons">+</div>
       </div>
     </div>
     <div class="row">

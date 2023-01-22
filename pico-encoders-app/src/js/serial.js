@@ -1,11 +1,28 @@
 const { SerialPort } = require("serialport");
 
-const MAPPING = {
-  "encoder1-inc": "/eos/wheel/pan",
-  "encoder1-dec": "/eos/wheel/pan",
-  "encoder2-inc": "/eos/wheel/tilt",
-  "encoder2-dec": "/eos/wheel/tilt",
-};
+const MODES = [
+  {
+    name: "Pan / Tilt",
+    encoderMap: {
+      encoder1: "/eos/wheel/pan",
+      encoder2: "/eos/wheel/tilt",
+    },
+  },
+  {
+    name: "Zoom / Edge",
+    encoderMap: {
+      encoder1: "/eos/wheel/zoom",
+      encoder2: "/eos/wheel/edge",
+    },
+  },
+  {
+    name: "Hue / Sat",
+    encoderMap: {
+      encoder1: "/eos/wheel/hue",
+      encoder2: "/eos/wheel/saturation",
+    },
+  },
+];
 
 module.exports = class SerialService {
   constructor(win, osc) {
@@ -13,6 +30,8 @@ module.exports = class SerialService {
     this.osc = osc;
     this.detectPico();
     this.connected = false;
+    this.speed = 2;
+    this.mode = 0;
   }
 
   async detectPico() {
@@ -35,16 +54,45 @@ module.exports = class SerialService {
   }
 
   mapMessage(data) {
-    if (data in MAPPING) {
-      if (data.includes("encoder")) {
+    if (data.includes("encoder")) {
+      if (data.substring(0, 8) in MODES[this.mode].encoderMap) {
         this.osc.sendOSC(
-          String(MAPPING[data]),
-          data.includes("inc") ? "1.0" : "-1.0"
+          String(MODES[this.mode].encoderMap[data.substring(0, 8)]),
+          data.includes("inc") ? `${this.speed}.0` : `-${this.speed}.0`
         );
-      } else {
-        this.osc.sendOSC(String(MAPPING[data]));
+      }
+    } else if (data.includes("push")) {
+      if (data == "push-up") {
+        this.speed = this.speed + 1;
+        if (this.speed > 4) this.speed = 1;
+        this.speedChanged();
+      }
+      if (data == "push-down") {
+        this.speed = this.speed - 1;
+        if (this.speed < 1) this.speed = 4;
+        this.speedChanged();
+      }
+      if (data == "push-left") {
+        this.mode = this.mode - 1;
+        if (this.mode < 0) this.mode = MODES.length - 1;
+        this.modeChanged();
+      }
+      if (data == "push-right") {
+        this.mode = this.mode + 1;
+        if (this.mode >= MODES.length) this.mode = 0;
+        this.modeChanged();
       }
     }
+  }
+
+  modeChanged() {
+    this.win.webContents.send("encoder-mode", MODES[this.mode].name);
+    this.logger("MODE", `Mode set to ${MODES[this.mode].name}`);
+  }
+
+  speedChanged() {
+    this.win.webContents.send("encoder-speed", this.speed);
+    this.logger("SPEED", `Speed set to ${this.speed}`);
   }
 
   close() {
