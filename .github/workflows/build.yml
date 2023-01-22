@@ -1,8 +1,6 @@
 name: Build
 on:
-  push:
-    paths:
-      - pico-encoders-app/**
+  workflow_dispatch:
 
 jobs:
   build_on_linux:
