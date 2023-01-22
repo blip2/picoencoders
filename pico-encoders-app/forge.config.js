@@ -5,7 +5,7 @@ module.exports = {
       config: {
         repository: {
           owner: "blip2",
-          name: "pico-encoders",
+          name: "picoencoders",
         },
       },
     },
