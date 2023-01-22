@@ -10,6 +10,8 @@ From within the `pico-encoders-app` folder, install all dependencies with `npm i
 
 Run the app in development mode with `npm run start` changes are not currently auto-reloaded.
 
+Releases are automatically built and available on the releases page.
+
 ## Pico Development
 
 Uses CircuitPython
