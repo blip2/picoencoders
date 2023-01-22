@@ -4,6 +4,8 @@ on:
     types:
       - created
 
+permissions: write-all
+
 jobs:
   publish_on_linux:
     runs-on: ubuntu-latest
