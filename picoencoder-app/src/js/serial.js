@@ -1,88 +1,91 @@
-const BREAK = "\r\n";
-let connected = false;
-const button = document.getElementById("serial-button");
+const { SerialPort } = require("serialport");
 
-MAPPING = {
+const MAPPING = {
   "encoder1-inc": "/eos/wheel/pan",
   "encoder1-dec": "/eos/wheel/pan",
   "encoder2-inc": "/eos/wheel/tilt",
   "encoder2-dec": "/eos/wheel/tilt",
 };
 
-function logger(type, message) {
-  const con = document.getElementById("console");
-  con.insertAdjacentHTML(
-    "afterbegin",
-    `${new Date().toISOString()} ${type} ${message}\n`
-  );
-}
+module.exports = class SerialService {
+  constructor(win, osc) {
+    this.win = win;
+    this.osc = osc;
+    this.detectPico();
+    this.connected = false;
+  }
 
-navigator.serial.addEventListener("connect", () => {
-  fetchSerialPorts();
-});
+  async detectPico() {
+    await SerialPort.list().then((ports, err) => {
+      const pico = ports.filter((device) => {
+        return device.vendorId == "239A" && device.productId == "80F4";
+      });
+      this.logger("CONNECT", `Looking for Pico Devices`);
 
-navigator.serial.addEventListener("disconnect", () => {
-  connected = false;
-  button.innerHTML = "Connect";
-  button.classList.add("primary");
-  logger("DISCONNECT", "Pico Serial Connection Disconnected");
-  fetchSerialPorts();
-});
-
-async function readFromSerial(port) {
-  await port.open({ baudRate: 9600 });
-  connected = true;
-  button.innerHTML = "Connected to Pico";
-  button.classList.remove("primary");
-  logger("CONNECT", "Pico Serial Connection Connected");
-  while (port.readable) {
-    const reader = port.readable.getReader();
-    let buffer = "";
-    try {
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) {
-          break;
-        }
-        buffer = buffer.concat(new TextDecoder().decode(value));
-        while (buffer.includes(BREAK)) {
-          let start = buffer.indexOf(BREAK);
-          let data = buffer.substring(0, start);
-          buffer = buffer.substring(start + 2);
-          logger("READ", data);
-          if (data in MAPPING) {
-            if (data.includes("encoder")) {
-              sendOSCMessage(
-                String(MAPPING[data]),
-                data.includes("inc") ? '1.0' : '-1.0'
-              );
-            } else {
-              sendOSCMessage(String(MAPPING[data]));
-            }
-          }
-        }
+      if (pico.length > 0) {
+        this.logger("CONNECT", `Found Pico Device at ${pico[0].path}`);
+        this.port = pico[0].path;
+        this.connect();
+      } else {
+        setTimeout(() => {
+          this.detectPico();
+        }, 2000);
       }
-    } catch (error) {
-      logger("ERROR", error);
-    } finally {
-      reader.releaseLock();
+    });
+  }
+
+  mapMessage(data) {
+    if (data in MAPPING) {
+      if (data.includes("encoder")) {
+        this.osc.sendOSC(
+          String(MAPPING[data]),
+          data.includes("inc") ? "1.0" : "-1.0"
+        );
+      } else {
+        this.osc.sendOSC(String(MAPPING[data]));
+      }
     }
   }
-}
 
-async function fetchSerialPorts() {
-  button.addEventListener("click", () => {
-    const filters = [{ usbVendorId: 0x239a, usbProductId: 0x80f4 }];
-    try {
-      navigator.serial.requestPort({ filters: filters }).then((port) => {
-        if (!connected) {
-          readFromSerial(port);
-        }
-      });
-    } catch (error) {
-      logger("ERROR", error);
+  close() {
+    if (this.connected) {
+      this.connected = false;
+      this.win.webContents.send("serial-state");
+      this.logger("DISCONNECT", "Pico Disconnected");
     }
-  });
-}
+    setTimeout(() => {
+      this.detectPico();
+    }, 2000);
+  }
 
-fetchSerialPorts();
+  async connect() {
+    this.serialport = await new SerialPort({
+      path: this.port,
+      baudRate: 9600,
+    });
+
+    this.connected = true;
+    this.logger("CONNECT", "Pico Connected");
+    this.win.webContents.send("serial-state", "OK");
+
+    const that = this;
+    this.serialport.on("data", function (data) {
+      const message = new TextDecoder().decode(data).trim();
+      if (message) {
+        that.mapMessage(message);
+      }
+    });
+
+    this.serialport.on("close", function (error) {
+      that.close();
+    });
+  }
+
+  logger(type, message) {
+    this.win.webContents.send(
+      "log-message",
+      `${new Date().toISOString()} ${type} ${message}\n`
+    );
+    console.log(type, message);
+  }
+};

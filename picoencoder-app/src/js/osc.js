@@ -1,41 +1,38 @@
-const oscButton = document.getElementById("osc-button");
-let host = document.getElementById("osc_server").value;
-let port = document.getElementById("osc_port").value;
+const OSC = require("osc-js");
 
-function logger(type, message) {
-  const con = document.getElementById("console");
-  con.insertAdjacentHTML(
-    "afterbegin",
-    `${new Date().toISOString()} ${type} ${message}\n`
-  );
-}
+module.exports = class OSCService {
+  constructor(win) {
+    this.host = "localhost";
+    this.port = "8000";
+    this.win = win;
+    this.osc = new OSC({ plugin: new OSC.DatagramPlugin() });
+  }
 
-async function valuesChanged() {
-  oscButton.innerHTML = "Update";
-  oscButton.classList.add("primary");
-}
+  sendOSC(address, value) {
+    this.osc.send(new OSC.Message(address, value), {
+      host: this.host,
+      port: this.port,
+    });
+    this.logger(
+      "OSC",
+      `Sent '${address} ${value}' to ${this.host}:${this.port} `
+    );
+  }
 
-function sendOSCMessage(address, value='') {
-    if (window.osc.send(host, port, address, value)) {
-      logger("OSC", `Sent '${address}' to ${host}:${port} `);
-    }
-}
+  logger(type, message = "") {
+    this.win.webContents.send(
+      "log-message",
+      `${new Date().toISOString()} ${type} ${message}\n`
+    );
+    console.log(type, message);
+  }
 
-async function updateValues() {
-  host = document.getElementById("osc_server").value;
-  port = document.getElementById("osc_port").value;
-  oscButton.innerHTML = "Saved";
-  oscButton.classList.remove("primary");
-}
-
-document.getElementById("osc_server").oninput = function () {
-  valuesChanged();
+  updateHost({ host, port }) {
+    this.host = host;
+    this.port = port;
+    this.logger(
+      "OSC",
+      `Updated host to ${this.host}:${this.port} `
+    );
+  }
 };
-document.getElementById("osc_port").oninput = function () {
-  valuesChanged();
-};
-document.getElementById("osc-button").onclick = function () {
-  updateValues();
-};
-
-updateValues();

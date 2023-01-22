@@ -1,16 +1,12 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
-const OSC = require("osc-js");
+
 const path = require("path");
+const OSCService = require("./js/osc");
+const SerialService = require("./js/serial");
 
 if (require("electron-squirrel-startup")) {
   app.quit();
 }
-
-const osc = new OSC({ plugin: new OSC.DatagramPlugin() })
-sendOSC = (object, {host, port, address, value}) => {
-  osc.send(new OSC.Message(address, value), { host: host, port: port });
-  return true;
-};
 
 const createWindow = async () => {
   const mainWindow = new BrowserWindow({
@@ -57,10 +53,12 @@ const createWindow = async () => {
 
   mainWindow.loadFile(path.join(__dirname, "index.html"));
 
-  const portSelected = await mainWindow.webContents.executeJavaScript(
-    `navigator.serial.requestPort({ filters: [{ usbVendorId: 0x239a, usbProductId: 0x80f4 }] }).then((port) => { readFromSerial(port) }).catch(error => logger('ERROR', error));`,
-    true
-  );
+  osc = new OSCService(mainWindow);
+  serial = new SerialService(mainWindow, osc);
+
+  ipcMain.handle("updateHost", (event, args) => {
+    osc.updateHost(args);
+  });
 };
 
 app.on("window-all-closed", () => {
@@ -70,7 +68,6 @@ app.on("window-all-closed", () => {
 });
 
 app.whenReady().then(() => {
-  ipcMain.handle("sendOSC", sendOSC);
   createWindow();
   app.on("activate", function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

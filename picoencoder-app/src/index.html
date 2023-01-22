@@ -12,9 +12,9 @@
   <div class="container">
     <div class="row">
       <div class="col">
-        <h3>Pico Serial Input</h3>
-        <div id="ports"></div>
-        <button id="serial-button" type="button" class="button primary">Connect</button>
+        <h3>Pico Encoder
+          <button id="serial-button" type="button" class="button error pull-right">Not Connected to Pico</button>
+        </h3>
       </div>
     </div>
     <div class="row">
@@ -53,8 +53,6 @@
   </div>
   </div>
   <script src="./renderer.js"></script>
-  <script src="./js/osc.js"></script>
-  <script src="./js/serial.js"></script>
 
   <style>
     body.dark {
