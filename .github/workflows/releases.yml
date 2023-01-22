@@ -8,15 +8,15 @@ jobs:
   publish_on_linux:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2       
-    - uses: actions/setup-node@master
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
       with:
-        node-version: 14
+        node-version: 16
     - name: install dependencies
-      working-directory: ./picoencoder-app
+      working-directory: ./pico-encoders-app
       run: npm install
     - name: publish
-      working-directory: ./picoencoder-app
+      working-directory: ./pico-encoders-app
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: npm run publish
@@ -24,15 +24,15 @@ jobs:
   publish_on_mac:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@master
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
       with:
-        node-version: 14
+        node-version: 16
     - name: install dependencies
-      working-directory: ./picoencoder-app
+      working-directory: ./pico-encoders-app
       run: npm install
     - name: publish
-      working-directory: ./picoencoder-app
+      working-directory: ./pico-encoders-app
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: npm run publish
@@ -40,15 +40,15 @@ jobs:
   publish_on_win:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2       
-    - uses: actions/setup-node@master
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
       with:
-        node-version: 14
+        node-version: 16
     - name: install dependencies
-      working-directory: ./picoencoder-app
+      working-directory: ./pico-encoders-app
       run: npm install
     - name: publish
-      working-directory: ./picoencoder-app
+      working-directory: ./pico-encoders-app
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: npm run publish

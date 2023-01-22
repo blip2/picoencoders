@@ -4,9 +4,9 @@ The concept is to provide a low cost encoder/other user interface solution for l
 
 ## App Development
 
-The app uses electron, using Web Sockets API for USB serial connection to the Pico and OSC-js to output OSC messages.
+The app uses electron, using SerialPort for USB serial connection to the Pico and OSC-js to output OSC messages.
 
-From within the `picoencoder-app` folder, install all dependencies with `npm install`
+From within the `pico-encoders-app` folder, install all dependencies with `npm install`
 
 Run the app in development mode with `npm run start` changes are not currently auto-reloaded.
 

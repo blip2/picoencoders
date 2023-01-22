@@ -24,7 +24,6 @@ module.exports = class OSCService {
       "log-message",
       `${new Date().toISOString()} ${type} ${message}\n`
     );
-    console.log(type, message);
   }
 
   updateHost({ host, port }) {

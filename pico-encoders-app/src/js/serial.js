@@ -86,6 +86,5 @@ module.exports = class SerialService {
       "log-message",
       `${new Date().toISOString()} ${type} ${message}\n`
     );
-    console.log(type, message);
   }
 };

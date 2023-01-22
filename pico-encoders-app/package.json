@@ -1,8 +1,8 @@
 {
-  "name": "picoencoder-app",
-  "productName": "picoencoder-app",
-  "version": "1.0.0",
-  "description": "My Electron application description",
+  "name": "pico-encoders-app",
+  "productName": "pico-encoders-app",
+  "version": "0.0.1",
+  "description": "Application to convert pico serial signals to ETC OSC commands",
   "main": "src/index.js",
   "scripts": {
     "start": "electron-forge start",
@@ -12,6 +12,9 @@
     "lint": "echo \"No linting configured\""
   },
   "keywords": [],
+  "engines": {
+   "node": ">=16.0.0"
+  },
   "author": {
     "name": "Ben Hussey",
     "email": "ben@blip2.net"
@@ -24,11 +27,9 @@
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.4",
-    "@electron-forge/maker-deb": "^6.0.4",
-    "@electron-forge/maker-rpm": "^6.0.4",
+    "@electron-forge/maker-dmg": "^6.0.4",
     "@electron-forge/maker-squirrel": "^6.0.4",
     "@electron-forge/maker-zip": "^6.0.4",
-    "@electron-forge/plugin-webpack": "^6.0.4",
     "@electron-forge/publisher-github": "^6.0.4",
     "electron": "22.0.3"
   }
