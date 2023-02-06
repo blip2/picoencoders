@@ -31,3 +31,11 @@ ipcRenderer.on("encoder-mode", function (evt, message) {
 ipcRenderer.on("encoder-speed", function (evt, message) {
   document.getElementById("speed").innerHTML = message;
 });
+
+ipcRenderer.on("osc-server", function (evt, message) {
+  document.getElementById("osc_server").value = message;
+});
+
+ipcRenderer.on("osc-port", function (evt, message) {
+  document.getElementById("osc_port").value = message;
+});

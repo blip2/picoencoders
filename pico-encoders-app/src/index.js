@@ -3,6 +3,7 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const OSCService = require("./js/osc");
 const SerialService = require("./js/serial");
+const { networkInterfaces } = require('os');
 
 if (require("electron-squirrel-startup")) {
   app.quit();
@@ -72,8 +73,13 @@ const createWindow = async () => {
     mainWindow.setAlwaysOnTop(bool);
   });
 
-  serial.modeChanged()
-  serial.speedChanged()
+  serial.modeChanged();
+  serial.speedChanged();
+
+  // Set to best guess for local IP address
+  const currentIP = Object.values(require('os').networkInterfaces()).reduce((r, list) => r.concat(list.reduce((rr, i) => rr.concat(i.family==='IPv4' && !i.internal && i.address || []), [])), [])[0];
+  osc.updateHost({ host: currentIP, port: 8000 });
+  mainWindow.webContents.send("osc-server", currentIP);
 };
 
 app.on("window-all-closed", () => {
